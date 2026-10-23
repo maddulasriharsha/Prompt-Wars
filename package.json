@@ -1,0 +1,12 @@
+{
+  "name": "celebration-twin",
+  "version": "1.0.0",
+  "description": "Celebration Twin: an event planner that simulates your wedding, birthday or community event before it happens.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "test": "node --test \"tests/*.test.js\""
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src https://generativelanguage.googleapis.com; worker-src 'self'; base-uri 'none'; form-action 'none'">
+  <meta name="description" content="Celebration Twin plans your wedding, birthday or community event, then simulates it thousands of times to show the odds of staying on budget and on time.">
+  <title>Celebration Twin</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%F0%9F%8E%89%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to main content</a>
+
+  <header class="site-header">
+    <h1>Celebration Twin</h1>
+    <p class="tagline">Plan your celebration, then <strong>rehearse it 5,000 times</strong> before it happens.</p>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <section aria-labelledby="intake-h" class="card">
+      <h2 id="intake-h">Tell us about your event</h2>
+      <p class="hint">Everything runs in your browser. Nothing is uploaded unless you add an optional AI key.</p>
+
+      <div id="error-summary" class="error-summary" role="alert" tabindex="-1" hidden></div>
+
+      <form id="intake" novalidate>
+        <div class="grid">
+          <div class="field">
+            <label for="type">Event type</label>
+            <select id="type" name="type" required>
+              <option value="wedding">Wedding</option>
+              <option value="birthday">Birthday</option>
+              <option value="community">Community event</option>
+            </select>
+            <p class="error" id="err-type"></p>
+          </div>
+          <div class="field">
+            <label for="guests">Number of guests</label>
+            <input id="guests" name="guests" type="number" inputmode="numeric" min="5" max="2000" step="1" value="150" required aria-describedby="err-guests">
+            <p class="error" id="err-guests"></p>
+          </div>
+          <div class="field">
+            <label for="budget">Total budget (&#8377;)</label>
+            <input id="budget" name="budget" type="number" inputmode="numeric" min="5000" step="1000" value="1200000" required aria-describedby="err-budget">
+            <p class="error" id="err-budget"></p>
+          </div>
+          <div class="field">
+            <label for="date">Event date</label>
+            <input id="date" name="date" type="date" required aria-describedby="err-date">
+            <p class="error" id="err-date"></p>
+          </div>
+          <div class="field">
+            <label for="city">City <span class="optional">(optional)</span></label>
+            <input id="city" name="city" type="text" maxlength="60" autocomplete="address-level2">
+          </div>
+          <div class="field check-field">
+            <label class="check"><input id="outdoor" name="outdoor" type="checkbox"> Outdoor setting</label>
+            <p class="hint">Turns on weather risk in the simulation.</p>
+          </div>
+        </div>
+
+        <fieldset>
+          <legend>Dietary needs among guests</legend>
+          <div class="checks">
+            <label class="check"><input type="checkbox" name="diets" value="vegetarian"> Vegetarian</label>
+            <label class="check"><input type="checkbox" name="diets" value="vegan"> Vegan</label>
+            <label class="check"><input type="checkbox" name="diets" value="jain"> Jain</label>
+            <label class="check"><input type="checkbox" name="diets" value="halal"> Halal</label>
+            <label class="check"><input type="checkbox" name="diets" value="glutenfree"> Gluten-free</label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Guest needs</legend>
+          <div class="checks">
+            <label class="check"><input type="checkbox" name="access" value="wheelchair"> Wheelchair access</label>
+            <label class="check"><input type="checkbox" name="access" value="elderly"> Elderly guests</label>
+            <label class="check"><input type="checkbox" name="access" value="kids"> Children</label>
+            <label class="check"><input type="checkbox" name="access" value="hearing"> Hearing or vision support</label>
+          </div>
+        </fieldset>
+
+        <div class="field">
+          <label for="notes">Wishes, themes or constraints <span class="optional">(optional, up to 300 characters)</span></label>
+          <textarea id="notes" name="notes" rows="3" maxlength="300" placeholder="e.g. eco-friendly, lots of music, surprise for grandma"></textarea>
+        </div>
+
+        <details class="ai-box">
+          <summary>Optional: add Gemini for AI-written ideas</summary>
+          <p class="hint">Paste a free API key from Google AI Studio. It stays in this tab&rsquo;s memory and is sent only to Google. Leave it empty to use the built-in planner.</p>
+          <div class="field">
+            <label for="apikey">Gemini API key</label>
+            <input id="apikey" type="password" autocomplete="off" spellcheck="false" maxlength="80">
+          </div>
+        </details>
+
+        <button type="submit" class="btn primary">Plan and simulate my event</button>
+      </form>
+    </section>
+
+    <div id="status" class="sr-only" role="status" aria-live="polite"></div>
+
+    <div id="results" hidden>
+      <nav aria-label="Jump to a section" class="jump">
+        <a href="#summary-h">Summary</a>
+        <a href="#twin-h">Digital twin</a>
+        <a href="#budget-h">Budget</a>
+        <a href="#timeline-h">Timeline</a>
+        <a href="#vendors-h">Vendors</a>
+        <a href="#ideas-h">Ideas</a>
+      </nav>
+
+      <div id="warnings"></div>
+      <section aria-labelledby="summary-h" class="card" id="summary"></section>
+      <section aria-labelledby="twin-h" class="card" id="twin"></section>
+      <section aria-labelledby="budget-h" class="card" id="budget-section"></section>
+      <section aria-labelledby="timeline-h" class="card" id="timeline-section"></section>
+      <section aria-labelledby="vendors-h" class="card" id="vendors-section"></section>
+      <section aria-labelledby="ideas-h" class="card" id="ideas-section"></section>
+
+      <div class="actions no-print">
+        <button type="button" class="btn" id="print">Print or save as PDF</button>
+        <button type="button" class="btn" id="download">Download plan (JSON)</button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>Figures are planning heuristics, not vendor quotes. Simulations use a seeded random generator, so the same inputs always give the same odds.</p>
+  </footer>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
